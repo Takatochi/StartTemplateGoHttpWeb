@@ -2,31 +2,16 @@
 package main
 
 import (
-	"fmt"
-	"html/template"
+	"log"
 	"net/http"
+	"www/server"
 )
 
-func index(w http.ResponseWriter, r *http.Request) {
-	//старт темлейтов для метода index (головна сторінка)
-	t, err := template.ParseFiles("templates/index.html", "templates/header.html", "templates/footer.html")
-
-	if err != nil {
-		fmt.Println(w, err.Error())
-	}
-	t.ExecuteTemplate(w, "index", nil)
-}
-
-func hadleRequst() {
-	//обробка шляху до стилів
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
-	//
-	http.HandleFunc("/", index)
-	http.ListenAndServe(":8080", nil)
-}
 func main() {
 
-	hadleRequst()
+	if err := run(); err != nil {
+		log.Fatal(err)
+	}
 
 	//провірка директорії
 	// dir, err := os.Getwd()
@@ -34,4 +19,18 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 	// fmt.Println(dir)
+}
+func run() error {
+	// hadleRequst()
+	// server.Print()
+	start := server.Init("/static/", "/")
+
+	start.Handle()
+	start.Request()
+
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		return err
+	}
+
+	return nil
 }
