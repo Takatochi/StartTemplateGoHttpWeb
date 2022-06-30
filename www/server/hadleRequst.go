@@ -1,7 +1,7 @@
 package server
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"text/template"
 )
@@ -9,30 +9,37 @@ import (
 type Server struct {
 	_handle    string
 	handlename string
+	maineroot  string
+	tmp        []string
 }
 
-func Init(_handle string, handlename string) *Server {
-	return &Server{
-		_handle:    _handle,
-		handlename: handlename,
-	}
+func Init() *Server {
+	return &Server{}
 
 }
-func (s *Server) Handle() {
+func (s *Server) Handle(_handle string) {
+	s._handle = _handle
 	http.Handle(s._handle, http.StripPrefix(s._handle, http.FileServer(http.Dir("."+s._handle))))
 
 }
 
-func (s *Server) Request() {
+func (s *Server) Request(maineroot string, handlename string, tmp []string) {
+	s.handlename = handlename
+	s.maineroot = maineroot
+	s.tmp = tmp
 	http.HandleFunc(s.handlename, s.index)
 
 }
 func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 	//старт темлейтов для метода index (головна сторінка)
-	t, err := template.ParseFiles("templates/index.html", "templates/header.html", "templates/footer.html")
 
-	if err != nil {
-		fmt.Println(w, err.Error())
+	t, err := template.ParseFiles(s.tmp[0])
+	for i := 1; i < len(s.tmp); i++ {
+		t.ParseFiles(s.tmp[i])
 	}
-	t.ExecuteTemplate(w, "index", nil)
+	if err != nil {
+		log.Println("Error executing template :", err)
+		return
+	}
+	t.ExecuteTemplate(w, s.maineroot, nil)
 }

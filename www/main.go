@@ -21,12 +21,11 @@ func main() {
 	// fmt.Println(dir)
 }
 func run() error {
-	// hadleRequst()
-	// server.Print()
-	start := server.Init("/static/", "/")
-
-	start.Handle()
-	start.Request()
+	tmp := []string{"templates/index.html", "templates/header.html", "templates/footer.html"}
+	start := server.Init()
+	start.Handle("/static/")
+	start.Handle("/content/")
+	start.Request("index", "/", tmp)
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		return err
