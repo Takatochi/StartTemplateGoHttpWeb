@@ -7,7 +7,8 @@ import (
 )
 
 type Server struct {
-	_handle    string
+	_handle    []string
+	handle     string
 	handlename string
 	maineroot  string
 	tmp        []string
@@ -17,10 +18,15 @@ func Init() *Server {
 	return &Server{}
 
 }
-func (s *Server) Handle(_handle string) {
+func (s *Server) Prefix(_handle []string) {
 	s._handle = _handle
-	http.Handle(s._handle, http.StripPrefix(s._handle, http.FileServer(http.Dir("."+s._handle))))
-
+	for i := 0; i < len(s._handle)-1; i++ {
+		s.Handle(s._handle[i])
+	}
+}
+func (s *Server) Handle(handle string) {
+	s.handle = handle
+	http.Handle(s.handle, http.StripPrefix(s.handle, http.FileServer(http.Dir("."+s.handle))))
 }
 
 func (s *Server) Request(maineroot string, handlename string, tmp []string) {

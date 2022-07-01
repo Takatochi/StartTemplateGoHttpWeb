@@ -22,9 +22,10 @@ func main() {
 }
 func run() error {
 	tmp := []string{"templates/index.html", "templates/header.html", "templates/footer.html"}
-	start := server.Init()
-	start.Handle("/static/")
-	start.Handle("/content/")
+	prf := []string{"/static/", "/content/"}
+	start := server.Server{}
+	start.Prefix(prf)
+	// start.Handle("/static/")
 	start.Request("index", "/", tmp)
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
